@@ -1,0 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Roboto:wght@400;700&display=swap');
+
+:root {
+    --christmas-red: #ce1616;
+    --christmas-green: #165B33;
+    --christmas-gold: #FFD700;
+    --snow-white: #fff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--christmas-red),
+        var(--christmas-red) 50px,
+        var(--christmas-green) 50px,
+        var(--christmas-green) 100px
+    );
+    display: flex;
+    flex-direction: column;
+    color: #333;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-family: 'Mountains of Christmas', cursive;
+    font-size: 3.5rem;
+    color: white;
+    text-shadow: 
+        2px 2px 0 #000,
+        -2px -2px 0 #000,
+        2px -2px 0 #000,
+        -2px 2px 0 #000,
+        4px 4px 8px rgba(0, 0, 0, 0.9);
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 
+            3px 3px 0 var(--christmas-red),
+            -3px -3px 0 var(--christmas-green),
+            3px -3px 0 var(--christmas-red),
+            -3px 3px 0 var(--christmas-green),
+            0 0 20px var(--christmas-gold);
+    }
+    50% {
+        text-shadow: 
+            3px 3px 0 var(--christmas-red),
+            -3px -3px 0 var(--christmas-green),
+            3px -3px 0 var(--christmas-red),
+            -3px 3px 0 var(--christmas-green),
+            0 0 30px var(--christmas-gold);
+    }
+}
+
+main {
+    background-color: var(--snow-white);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.question-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin: 2rem auto;
+    max-width: 600px;
+    margin-bottom: 40px;
+}
+
+.question {
+    font-size: 1.5rem;
+    margin: 20px 0;
+    color: var(--christmas-green);
+}
+
+.buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-weight: bold;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-sim {
+    background-color: var(--christmas-green);
+    color: var(--snow-white);
+}
+
+.btn-nao {
+    background-color: var(--christmas-red);
+    color: var(--snow-white);
+}
+
+.result {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    margin: 2rem auto;
+    max-width: 600px;
+    margin: 40px 0;
+}
+
+.present-animation {
+    margin: 30px 0;
+}
+
+.present {
+    width: 150px;
+    animation: bounce 1s infinite;
+}
+
+.tears-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.tear {
+    position: absolute;
+    width: 10px;
+    height: 20px;
+    background: linear-gradient(180deg, #4FC3F7 0%, rgba(79, 195, 247, 0.3) 100%);
+    border-radius: 50%;
+    animation: falling linear infinite;
+}
+
+.crying-face {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.crying-emoji {
+    width: 100px;
+    height: 100px;
+}
+
+.audio-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.music-btn {
+    background-color: var(--christmas-red);
+    color: var(--snow-white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.music-btn:hover {
+    transform: scale(1.05);
+    background-color: #ff0000;
+}
+
+.music-btn.playing {
+    background-color: var(--christmas-green);
+}
+
+.youtube-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.youtube-container.minimized {
+    transform: scale(0.7);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.youtube-container:hover {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.hidden-player {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.form-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin: 2rem auto;
+    border: 2px solid var(--christmas-red);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--christmas-red);
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid var(--christmas-green);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--christmas-red);
+    box-shadow: 0 0 10px rgba(206, 22, 22, 0.2);
+}
+
+.form-group textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.btn-enviar {
+    background: var(--christmas-red);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.btn-enviar:hover {
+    background: var(--christmas-green);
+    transform: scale(1.02);
+}
+
+.live-info {
+    background: rgba(255, 255, 255, 0.95);
+    margin-top: 50px;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.live-info h3 {
+    color: var(--christmas-red);
+    font-family: 'Mountains of Christmas', cursive;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.live-details {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+footer {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.voice-select {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: 2px solid var(--christmas-red);
+    background-color: white;
+    color: var(--christmas-red);
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.voice-select:hover {
+    background-color: var(--christmas-red);
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 80%;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes falling {
+    0% {
+        transform: translateY(-20vh) translateX(0);
+        opacity: 1;
+    }
+    80% {
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateY(120vh) translateX(-20px);
+        opacity: 0;
+    }
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

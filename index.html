@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papai Noel - Natal Solidário</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="audio-controls">
+        <button onclick="toggleMusic()" class="music-btn">🎵 Música de Natal</button>
+    </div>
+    <audio id="christmasMusic" loop>
+        <source src="christmas-ring-101soundboards.mp3" type="audio/mp3">
+    </audio>
+    <audio id="hohoho">
+        <source src="https://www.soundjay.com/misc/sounds/santa-ho-ho-ho-1.mp3" type="audio/mp3">
+    </audio>
+    <div class="container">
+        <header>
+            <h1>🎅 Carta para o Papai Noel 🎄</h1>
+            <button class="music-btn" onclick="toggleMusic()">
+                🎵 Música de Natal
+            </button>
+            <select id="voiceSelect" class="voice-select">
+                <option value="">Selecione uma voz</option>
+            </select>
+        </header>
+
+        <main>
+            <div id="formContainer" class="form-container">
+                <form id="cartaNoel" onsubmit="enviarCarta(event)">
+                    <div class="form-group">
+                        <label for="nome">Qual é o seu nome?</label>
+                        <input type="text" id="nome" name="nome" required placeholder="Digite seu nome aqui">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="presente">Qual presente você gostaria de ganhar?</label>
+                        <textarea id="presente" name="presente" required placeholder="Conte para o Papai Noel o que você quer ganhar..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-enviar">✨ Enviar para o Papai Noel ✨</button>
+                </form>
+            </div>
+
+            <div class="question-container" id="questionContainer" style="display: none;">
+                <h2>Olá, <span id="nomeDisplay"></span>!</h2>
+                <p class="question">Você se comportou bem este ano?</p>
+                <div class="buttons">
+                    <button onclick="responder('sim')" class="btn btn-sim">Sim!</button>
+                    <button onclick="responder('nao')" class="btn btn-nao">Não</button>
+                </div>
+            </div>
+
+            <div class="result" id="resultadoSim" style="display: none;">
+                <h2>🎁 Parabéns! 🎉</h2>
+                <p id="mensagemSim"></p>
+                <div class="present-animation">
+                    <img src="https://em-content.zobj.net/source/microsoft/319/wrapped-gift_1f381.png" alt="Presente" class="present">
+                </div>
+            </div>
+
+            <div class="result" id="resultadoNao" style="display: none;">
+                <h2>😭 Oh não!</h2>
+                <p id="mensagemNao"></p>
+                <div class="crying-face">
+                    <img src="https://em-content.zobj.net/source/microsoft/319/loudly-crying-face_1f62d.png" alt="Chorando" class="crying-emoji">
+                </div>
+                <div class="tears-container"></div>
+            </div>
+
+            <div class="live-info">
+                <h3>🎄 Live Solidária de Natal 🎄</h3>
+                <p>Participe da nossa live especial em dezembro!</p>
+                <p>Vamos arrecadar presentes para fazer o Natal de muitas crianças mais feliz!</p>
+                <div class="live-details">
+                    <p>📅 Data: Dezembro 2023</p>
+                    <p>🎁 Traga um presente para doar</p>
+                    <p>❤️ Faça parte desta corrente do bem</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Feito com ❤️ para espalhar amor no Natal</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
