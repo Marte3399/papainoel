@@ -190,17 +190,18 @@ main {
     background-color: var(--christmas-red);
     color: var(--snow-white);
     border: none;
-    padding: 10px 20px;
-    border-radius: 50px;
+    padding: 8px 15px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
 }
 
 .music-btn:hover {
     transform: scale(1.05);
-    background-color: #ff0000;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    background-color: #e61919;
 }
 
 .music-btn.playing {
@@ -331,15 +332,16 @@ footer {
 }
 
 .voice-select {
-    padding: 8px 15px;
+    padding: 8px 12px;
     border-radius: 20px;
     border: 2px solid var(--christmas-red);
     background-color: white;
     color: var(--christmas-red);
     font-size: 1rem;
     cursor: pointer;
-    margin: 10px;
     transition: all 0.3s ease;
+    max-width: 100%;
+    margin: 10px 0;
 }
 
 .voice-select:hover {
@@ -347,13 +349,58 @@ footer {
     color: white;
 }
 
-@media (max-width: 768px) {
+.santa-video-container {
+    max-width: 500px;
+    margin: 20px auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    aspect-ratio: 16/9;
+}
+
+.santa-video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.loading-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+}
+
+@media screen and (max-width: 768px) {
+    .voice-select {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+        width: 100%;
+    }
+    .music-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    .santa-video-container {
+        max-width: 100%;
+        margin: 10px auto;
+    }
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
     .container {
-        padding: 10px;
+        margin: 10px;
+        padding: 15px;
     }
 
-    h1 {
-        font-size: 2.5rem;
+    header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
     }
 
     main {
@@ -362,11 +409,63 @@ footer {
 
     .buttons {
         flex-direction: column;
-        align-items: center;
+        gap: 10px;
     }
 
     .btn {
-        width: 80%;
+        width: 100%;
+        padding: 12px 20px;
+    }
+
+    .form-container {
+        padding: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    textarea, input {
+        width: 100%;
+        padding: 8px;
+    }
+
+    .question {
+        font-size: 1.2rem;
+    }
+
+    .result {
+        padding: 1rem;
+        margin: 20px 0;
+    }
+
+    .present {
+        width: 100px;
+    }
+
+    .crying-emoji {
+        width: 80px;
+        height: 80px;
+    }
+
+    .audio-controls {
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .container {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    main {
+        padding: 15px;
     }
 }
 

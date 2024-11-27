@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="audio-controls">
-        <button onclick="toggleMusic()" class="music-btn">🎵 Música de Natal</button>
+        <button onclick="toggleMusic()" class="music-btn" title="Música de Natal">🎵</button>
     </div>
     <audio id="christmasMusic" loop>
         <source src="christmas-ring-101soundboards.mp3" type="audio/mp3">
@@ -27,6 +27,14 @@
                 <option value="">Selecione uma voz</option>
             </select>
         </header>
+
+        <div id="santa-video-container" class="santa-video-container">
+            <img id="santa-image" src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator.gif" 
+                 alt="Carregando..." class="loading-indicator">
+            <video id="santa-video" controls autoplay style="display: none;">
+                <source type="video/mp4">
+            </video>
+        </div>
 
         <main>
             <div id="formContainer" class="form-container">

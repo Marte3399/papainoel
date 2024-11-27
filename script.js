@@ -8,9 +8,12 @@ let selectedVoice = null;
 // Função para carregar as vozes disponíveis
 function carregarVozes() {
     const voiceSelect = document.getElementById('voiceSelect');
+    
+    // Limpa o select
     voiceSelect.innerHTML = '<option value="">Selecione uma voz</option>';
     
-    let voices = speechSynthesis.getVoices();
+    // Obtém as vozes disponíveis
+    let voices = window.speechSynthesis.getVoices();
     
     // Se não houver vozes ainda, tenta novamente em 100ms
     if (voices.length === 0) {
@@ -18,13 +21,11 @@ function carregarVozes() {
         return;
     }
     
-    // Filtra apenas vozes em português
+    // Filtra vozes em português e português do Brasil
     const ptVoices = voices.filter(voice => 
-        voice.lang.startsWith('pt') || 
-        voice.lang.startsWith('por')
+        voice.lang.toLowerCase().includes('pt') || 
+        voice.lang.toLowerCase().includes('por')
     );
-    
-    console.log('Vozes disponíveis:', ptVoices);
     
     // Se não encontrar vozes em português, usa todas as vozes
     const voicesToUse = ptVoices.length > 0 ? ptVoices : voices;
@@ -36,25 +37,36 @@ function carregarVozes() {
         option.textContent = `${voice.name} (${voice.lang})`;
         voiceSelect.appendChild(option);
     });
+
+    // Se houver apenas uma voz, seleciona ela automaticamente
+    if (voicesToUse.length === 1) {
+        voiceSelect.value = voicesToUse[0].name;
+        selectedVoice = voicesToUse[0];
+    }
 }
 
-// Tenta carregar as vozes quando a página carregar
-document.addEventListener('DOMContentLoaded', () => {
-    carregarVozes();
-    // Alguns navegadores precisam deste evento
-    speechSynthesis.onvoiceschanged = carregarVozes;
-});
+// Inicializa as vozes quando a página carregar
+window.speechSynthesis.onvoiceschanged = carregarVozes;
+document.addEventListener('DOMContentLoaded', carregarVozes);
 
 // Atualiza a voz selecionada
 document.getElementById('voiceSelect').addEventListener('change', (e) => {
-    const voices = speechSynthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
     selectedVoice = voices.find(voice => voice.name === e.target.value);
     
     // Testa a voz selecionada
     if (selectedVoice) {
-        falar('Olá! Esta é a voz que você selecionou.');
+        const textoTeste = 'Olá! Esta é a voz que você selecionou.';
+        falar(textoTeste);
     }
 });
+
+// Tenta carregar as vozes quando a página carregar
+// document.addEventListener('DOMContentLoaded', () => {
+//     carregarVozes();
+//     // Alguns navegadores precisam deste evento
+//     speechSynthesis.onvoiceschanged = carregarVozes;
+// });
 
 // Função para falar o texto
 function falar(texto) {
@@ -84,7 +96,75 @@ function falar(texto) {
     speechSynthesis.speak(utterance);
 }
 
-function enviarCarta(event) {
+async function createSantaVideo(text) {
+    const API_KEY = 'bWFydGUzMzk5QGdtYWlsLmNvbQ:_ZJplOUUJ-_ac7l5DgwI2';
+    const sourceUrl = 'https://ogimg.infoglobo.com.br/in/23324147-126-f83/FT1086A/80364226_MANUAL-DE-CONDUTA-DO-PAPAI-NOELCurso-ensina-como-papai-noel-dome.jpg';
+
+    try {
+        // Criar o vídeo
+        const response = await fetch('https://api.d-id.com/talks', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                script: {
+                    type: 'text',
+                    input: text,
+                    provider: {
+                        type: 'microsoft',
+                        voice_id: 'pt-BR-AntonioNeural'
+                    }
+                },
+                source_url: sourceUrl
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao criar o vídeo');
+        }
+
+        const data = await response.json();
+        
+        // Aguardar o vídeo ficar pronto
+        const videoId = data.id;
+        let videoUrl = null;
+        
+        while (!videoUrl) {
+            const statusResponse = await fetch(`https://api.d-id.com/talks/${videoId}`, {
+                headers: {
+                    'Authorization': `Basic ${API_KEY}`,
+                }
+            });
+            
+            const statusData = await statusResponse.json();
+            
+            if (statusData.status === 'done') {
+                videoUrl = statusData.result_url;
+            } else if (statusData.status === 'error') {
+                throw new Error('Erro ao processar o vídeo');
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Atualizar o elemento de vídeo
+        const video = document.getElementById('santa-video');
+        const loadingIndicator = document.getElementById('santa-image');
+        
+        video.src = videoUrl;
+        video.style.display = 'block';
+        loadingIndicator.style.display = 'none';
+        
+        return videoUrl;
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Desculpe, houve um erro ao criar o vídeo do Papai Noel.');
+    }
+}
+
+async function enviarCarta(event) {
     event.preventDefault();
     
     nomeAtual = document.getElementById('nome').value;
@@ -103,9 +183,30 @@ function enviarCarta(event) {
     // Toca o som do Papai Noel
     playHoHoHo();
 
+    // Cria o texto para o vídeo
+    const textoVideo = `HO HO HO! Olá ${nomeAtual}! Que alegria receber sua carta! 
+        Você pediu um ${presenteAtual}? Que pedido interessante! 
+        Vou verificar se você tem se comportado bem este ano!`;
+    
+    // Criar o vídeo do Papai Noel
+    await createSantaVideo(textoVideo);
+
     // Fala o presente que a criança pediu
-    const textoPresente = `${nomeAtual} quer ganhar ${presenteAtual} de presente!`;
-    setTimeout(() => falar(textoPresente), 1500); // Espera 1.5s depois do Ho Ho Ho
+    const textoPresente = `HO HO HO HO HO! Feliz Natal! . 
+        Hoje é um dia mágico, cheio de alegria, amor e surpresas incríveis! 
+         Parabéns ${nomeAtual}! Se você continuar assim, pode ganhar ${presenteAtual} do Papai Noel!`.replace(/\n/g, ' ');
+    
+    // Divide o texto em partes menores para falar
+    const partes = textoPresente.split('.');
+    let delay = 1500; // Começa após o Ho Ho Ho
+
+    // Fala cada parte do texto com um intervalo
+    partes.forEach((parte, index) => {
+        if (parte.trim()) {
+            setTimeout(() => falar(parte.trim()), delay);
+            delay += 5000; // Espera 5 segundos entre cada parte
+        }
+    });
 }
 
 function responder(resposta) {
