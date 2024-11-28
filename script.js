@@ -96,71 +96,226 @@ function falar(texto) {
     speechSynthesis.speak(utterance);
 }
 
+// Função para limpar o texto antes de enviar para a API
+function limparTexto(texto) {
+    return texto
+        .replace(/\s+/g, ' ') // Remove espaços extras
+        .replace(/[\n\r]/g, ' ') // Remove quebras de linha
+        .trim(); // Remove espaços no início e fim
+}
+
 async function createSantaVideo(text) {
-    const API_KEY = 'bWFydGUzMzk5QGdtYWlsLmNvbQ:_ZJplOUUJ-_ac7l5DgwI2';
-    const sourceUrl = 'https://ogimg.infoglobo.com.br/in/23324147-126-f83/FT1086A/80364226_MANUAL-DE-CONDUTA-DO-PAPAI-NOELCurso-ensina-como-papai-noel-dome.jpg';
-
     try {
-        // Criar o vídeo
-        const response = await fetch('https://api.d-id.com/talks', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Basic ${API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                script: {
-                    type: 'text',
-                    input: text,
-                    provider: {
-                        type: 'microsoft',
-                        voice_id: 'pt-BR-AntonioNeural'
-                    }
-                },
-                source_url: sourceUrl
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Falha ao criar o vídeo');
-        }
-
-        const data = await response.json();
-        
-        // Aguardar o vídeo ficar pronto
-        const videoId = data.id;
-        let videoUrl = null;
-        
-        while (!videoUrl) {
-            const statusResponse = await fetch(`https://api.d-id.com/talks/${videoId}`, {
-                headers: {
-                    'Authorization': `Basic ${API_KEY}`,
-                }
-            });
-            
-            const statusData = await statusResponse.json();
-            
-            if (statusData.status === 'done') {
-                videoUrl = statusData.result_url;
-            } else if (statusData.status === 'error') {
-                throw new Error('Erro ao processar o vídeo');
-            } else {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-        }
-
-        // Atualizar o elemento de vídeo
-        const video = document.getElementById('santa-video');
+        console.log('Iniciando createSantaVideo');
+        const videoContainer = document.getElementById('santa-video-container');
+        const videoElement = document.getElementById('santa-video');
         const loadingIndicator = document.getElementById('santa-image');
         
-        video.src = videoUrl;
-        video.style.display = 'block';
-        loadingIndicator.style.display = 'none';
+        // Variável para controlar o estado do vídeo
+        let shouldPlayVideo = true;
         
-        return videoUrl;
+        if (!videoContainer) {
+            console.error('Container de vídeo não encontrado');
+            return;
+        }
+
+        console.log('Container encontrado:', videoContainer);
+        
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'block';
+        }
+
+        // Limpar o vídeo existente
+        if (videoElement) {
+            videoElement.remove();
+        }
+
+        // Criar o elemento de vídeo
+        const video = document.createElement('video');
+        video.id = 'santa-video';
+        
+        // Log do estado inicial do vídeo
+        console.log('Vídeo criado:', {
+            width: video.width,
+            height: video.height,
+            readyState: video.readyState,
+            networkState: video.networkState
+        });
+
+        // Estilo do vídeo
+        Object.assign(video.style, {
+            width: '100%',
+            height: 'auto',
+            maxWidth: '800px',
+            maxHeight: '800px',
+            display: 'block',
+            margin: '0 auto',
+            border: '2px solid #ff0000',
+            borderRadius: '10px',
+            boxShadow: '0 0 10px rgba(255,0,0,0.3)',
+            backgroundColor: '#ffffff',
+            objectFit: 'cover'
+        });
+        
+        // Configurar o vídeo
+        video.loop = true;
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        video.controls = true;
+        
+        // Eventos de debug
+        video.onloadstart = () => console.log('Começou a carregar o vídeo');
+        video.onloadeddata = () => console.log('Dados do vídeo carregados');
+        video.onloadedmetadata = () => console.log('Metadados do vídeo carregados');
+        video.onprogress = () => console.log('Progresso no carregamento do vídeo');
+        video.onstalled = () => console.log('Carregamento do vídeo travou');
+        video.onsuspend = () => console.log('Carregamento do vídeo suspenso');
+        video.onwaiting = () => console.log('Vídeo aguardando dados');
+        
+        // Tentar primeiro o vídeo papainoel.mp4
+        const source = document.createElement('source');
+        source.src = './videos/papainoel2.mp4';
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        
+        console.log('Source adicionada:', source.src);
+        
+        // Reproduzir o vídeo quando estiver pronto
+        video.oncanplay = () => {
+           
+            if (videoContainer && loadingIndicator && shouldPlayVideo) {
+                loadingIndicator.style.display = 'none';
+                
+                // Adicionar o vídeo ao container
+                videoContainer.appendChild(video);
+                console.log('Vídeo adicionado ao container');
+                
+                // Tentar reproduzir o vídeo
+                if (shouldPlayVideo) {
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => console.log('Vídeo começou a reproduzir'))
+                            .catch(error => {
+                                if (error.name !== 'AbortError') {
+                                    console.error('Erro ao reproduzir o vídeo:', error);
+                                }
+                            });
+                    }
+                }
+            }
+        };
+
+        // Tratar erros do vídeo
+        video.onerror = (e) => {
+            const error = video.error;
+            console.error('Erro ao carregar o vídeo:', {
+                code: error ? error.code : 'unknown',
+                message: error ? error.message : 'unknown',
+                networkState: video.networkState,
+                readyState: video.readyState
+            });
+            
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            
+            // Tentar o outro vídeo
+            if (source.src.includes('papainoel2.mp4')) {
+                console.log('Tentando vídeo alternativo');
+                source.src = './videos/painoel.mp4';
+                video.load();
+            } else {
+                console.log('Usando fallback de imagem');
+                useFallbackImage(videoContainer);
+            }
+        };
+
+        // Função de fallback para usar imagem estática
+        function useFallbackImage(container) {
+            console.log('Iniciando fallback para imagem');
+            const img = new Image();
+            img.src = './images/papinoel3.jpg';
+            
+            Object.assign(img.style, {
+                width: '100%',
+                height: 'auto',
+                maxWidth: '500px',
+                display: 'block',
+                margin: '0 auto',
+                border: '2px solid #ff0000',
+                borderRadius: '10px',
+                boxShadow: '0 0 10px rgba(255,0,0,0.3)'
+            });
+            
+            container.innerHTML = '';
+            container.appendChild(img);
+            console.log('Imagem de fallback adicionada');
+        }
+
+        // Reproduzir o áudio
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.5;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+        
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+        
+        // Eventos de áudio
+        utterance.onstart = () => {
+            console.log('Áudio iniciado');
+            shouldPlayVideo = true;
+            if (video.paused && shouldPlayVideo) {
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => console.log('Vídeo iniciado com o áudio'))
+                        .catch(error => {
+                            if (error.name !== 'AbortError') {
+                                console.error('Erro ao iniciar vídeo com áudio:', error);
+                            }
+                        });
+                }
+            }
+        };
+        
+        utterance.onend = () => {
+            console.log('Áudio finalizado');
+            shouldPlayVideo = false;
+            // Garantir que o vídeo pare imediatamente
+            try {
+                video.pause();
+                video.currentTime = 0;
+                console.log('Vídeo parado com sucesso');
+            } catch (error) {
+                console.error('Erro ao parar o vídeo:', error);
+            }
+            // Disparar confete
+            dispararConfete();
+        };
+        
+        // Adicionar evento para garantir que o vídeo pare
+        video.addEventListener('timeupdate', () => {
+            if (!shouldPlayVideo || speechSynthesis.speaking === false) {
+                video.pause();
+                video.currentTime = 0;
+            }
+        });
+        
+        speechSynthesis.speak(utterance);
+
     } catch (error) {
-        console.error('Erro:', error);
-        alert('Desculpe, houve um erro ao criar o vídeo do Papai Noel.');
+        console.error('Erro detalhado:', error);
+        falar(text);
+        
+        const loadingIndicator = document.getElementById('santa-image');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
     }
 }
 
@@ -182,55 +337,55 @@ async function enviarCarta(event) {
     
     // Toca o som do Papai Noel
     playHoHoHo();
-
-    // Cria o texto para o vídeo
-    const textoVideo = `HO HO HO! Olá ${nomeAtual}! Que alegria receber sua carta! 
-        Você pediu um ${presenteAtual}? Que pedido interessante! 
-        Vou verificar se você tem se comportado bem este ano!`;
-    
-    // Criar o vídeo do Papai Noel
-    await createSantaVideo(textoVideo);
-
-    // Fala o presente que a criança pediu
-    const textoPresente = `HO HO HO HO HO! Feliz Natal! . 
-        Hoje é um dia mágico, cheio de alegria, amor e surpresas incríveis! 
-         Parabéns ${nomeAtual}! Se você continuar assim, pode ganhar ${presenteAtual} do Papai Noel!`.replace(/\n/g, ' ');
-    
-    // Divide o texto em partes menores para falar
-    const partes = textoPresente.split('.');
-    let delay = 1500; // Começa após o Ho Ho Ho
-
-    // Fala cada parte do texto com um intervalo
-    partes.forEach((parte, index) => {
-        if (parte.trim()) {
-            setTimeout(() => falar(parte.trim()), delay);
-            delay += 5000; // Espera 5 segundos entre cada parte
-        }
-    });
 }
 
-function responder(resposta) {
+async function responder(resposta) {
     const questionContainer = document.getElementById('questionContainer');
     const resultadoSim = document.getElementById('resultadoSim');
     const resultadoNao = document.getElementById('resultadoNao');
-    const mensagemSim = document.getElementById('mensagemSim');
-    const mensagemNao = document.getElementById('mensagemNao');
-
+    
     questionContainer.style.display = 'none';
-
+    
+    let textoVideo = '';
+    
     if (resposta === 'sim') {
         resultadoSim.style.display = 'block';
-        const mensagem = `Parabéns ${nomeAtual}! Você vai ganhar ${presenteAtual} do Papai Noel!`;
-        mensagemSim.textContent = mensagem;
+        textoVideo = limparTexto(` HO HO HO HO HO! Olá ${nomeAtual}! Que alegria receber sua carta! 
+    Quero muito saber se você tem sido uma criança boazinha, obediente e bem comportada? 
+        Você pediu um presente bem legal ${presenteAtual}? Que pedido interessante! 
+        Vou verificar se você tem se comportado bem este ano!
+        Parabéns ${nomeAtual}! Você vai ganhar ${presenteAtual} do Papai Noel! 
+            E já que você é uma criança tão boa, quero te convidar para algo muito especial!
+            Em dezembro, teremos uma Live!
+            Será um momento mágico onde podemos conversar.
+            E voce tambem pode ajudar o papai noel a fazer muitas crianças sorrirem.
+            Qualquer doação voluntária via Pix será muito bem-vinda.
+            Vamos juntos espalhar amor e solidariedade neste Natal!
+            
+            
+            `);
         dispararConfete();
-        falar(mensagem);
     } else {
         resultadoNao.style.display = 'block';
-        const mensagem = `Que pena ${nomeAtual}, mas ainda dá tempo de melhorar! O Papai Noel acredita em você!`;
-        mensagemNao.textContent = mensagem;
+        textoVideo = limparTexto(`HO HO HO HO HO! Olá ${nomeAtual}! 
+            Que alegria receber sua carta! 
+            Quero muito saber se você tem sido uma criança boazinha, obediente e bem comportada?
+            Você pediu um presente bem legal ${presenteAtual}? Que pedido interessante! 
+            Vou verificar se você tem se comportado bem este ano!
+            Que pena ${nomeAtual} voce não tem se comportado bem, mas ainda dá tempo de melhorar! 
+            O Papai Noel acredita em você!            
+            E sabe de uma coisa? Você pode começar a melhorar agora mesmo!
+            Em dezembro, teremos uma Live!
+            Será um momento mágico onde podemos conversar.
+            E voce tambem pode ajudar o papai noel a fazer muitas crianças sorrirem.
+            Qualquer doação voluntária via Pix será muito bem-vinda.
+            Vamos juntos espalhar amor e solidariedade neste Natal!
+            
+            `);
         criarLagrimas();
-        falar(mensagem);
     }
+    
+    await createSantaVideo(textoVideo);
 }
 
 function toggleMusic() {

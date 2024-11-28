@@ -350,19 +350,22 @@ footer {
 }
 
 .santa-video-container {
-    max-width: 500px;
-    margin: 20px auto;
-    background: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    position: relative;
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    position: relative;
-    aspect-ratio: 16/9;
 }
 
-.santa-video-container video {
+#santa-video {
     width: 100%;
-    height: 100%;
+    height: auto;
+    display: block;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background-color: var(--snow-white);
+    aspect-ratio: 16/9;
     object-fit: cover;
 }
 
